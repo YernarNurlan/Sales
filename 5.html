@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout Design</title>
+    <!-- Include Roboto Font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: #00294B; /* Background color */
+        }
+        .container {
+            display: flex;
+            flex-direction: column; /* Organize children vertically */
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 38%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .rectangle-groups {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .rectangle-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 20px; /* Adjusted spacing between the two groups */
+
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .rectangle {
+            width: 150px;
+            height: 250px;
+            background-color: #000228;
+            margin: 0 10px;
+            border-radius: 14px;
+            color: #FFFFFF; /* Color of the numbers */
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            font-size: 145px; /* Size of the numbers */
+            font-family: 'Arial', sans-serif; /* Font of the numbers */
+            animation: fadeIn 1s ease-out;
+        }
+        .text-under-rectangles {
+            font-family: 'Roboto', sans-serif; /* Apply Roboto font */
+            color: #FFFFFF;
+            font-size: 80px;
+            text-align: center;
+            margin-top: 80px; /* Space between rectangles and text */
+        }
+        .image-container {
+            position: fixed;
+            bottom: -270px;
+            right: -150px;
+        }
+        .image-container img {
+            display: block;
+            width: 580px;
+            height: auto;
+        }
+        .current-date {
+    position: fixed;
+    left: -150px;
+    bottom: -320px;
+    margin: 20px;
+    color: #FFFFFF; /* Set the text color */
+    font-family: 'Roboto', sans-serif; /* Use Roboto font */
+    font-size: 80px; /* Adjust the font size as needed */
+    z-index: 1000;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="rectangle-groups">
+            <div class="rectangle-group">
+                <div class="rectangle"></div>
+                <div class="rectangle"></div>
+                <div class="rectangle"></div>
+            </div>
+            <div class="rectangle-group">
+                <div class="rectangle"></div>
+                <div class="rectangle"></div>
+                <div class="rectangle"></div>
+            </div>
+        </div>
+        <div class="text-under-rectangles">АВТОКӨЛІК САТЫЛДЫ</div>
+        <div class="image-container">
+            <img src="Logo.svg" alt="C:\Users\ye.nurlan\Desktop\Display sale">
+             <div class="current-date" id="currentDate">
+    </div>
+        </div>
+    </div>
+      
+ <script>
+    async function fetchSheetData() {
+        const apiKey = 'AIzaSyD3_6IcWUf3CiIcuXD_7z7-Og75FFIDp7I';
+        const spreadsheetId = '1Me844ireFATDvtwzNAqaZd-Y0LvCpXY2kCo9mcE522Y';
+        const range = 'Sheet 3!B2'; // e.g., 'Sheet1!A1'
+        const url = 'https://sheets.googleapis.com/v4/spreadsheets/1Me844ireFATDvtwzNAqaZd-Y0LvCpXY2kCo9mcE522Y/values/Sheet 3!B2?key=AIzaSyD3_6IcWUf3CiIcuXD_7z7-Og75FFIDp7I';
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            const numbers = data.values[0][0]; // Assuming the number is in the first cell of the specified range
+            distributeNumbersToRectangles(numbers);
+        } catch (error) {
+            console.error('Error fetching data from Google Sheets:', error);
+        }
+    }
+
+    function distributeNumbersToRectangles(numbers) {
+    const rectangles = document.querySelectorAll('.rectangle');
+    // First, clear all rectangles
+    rectangles.forEach(rectangle => {
+        rectangle.textContent = ''; // Clear the rectangle content
+    });
+
+    // Split the numbers into an array and reverse it for right-to-left filling
+    const numArray = numbers.split('').reverse();
+
+    // The reversed order for distributing numbers, considering two groups of three rectangles each.
+    const order = [5, 4, 3, 2, 1, 0]; 
+
+    for (let i = 0; i < numArray.length; i++) {
+        // Ensure we don't try to access an index out of bounds
+        if(i < rectangles.length){
+            // Place each number in its correct rectangle according to the specified order
+            rectangles[order[i]].textContent = numArray[i];
+        }
+    }
+}
+
+function displayCurrentDate() {
+    const now = new Date();
+    const day = now.getDate().toString().padStart(2, '0');
+    const month = (now.getMonth() + 1).toString().padStart(2, '0'); // January is 0!
+    const year = now.getFullYear();
+
+    const formattedDate = `${day}.${month}.${year}`;
+    document.getElementById('currentDate').textContent = formattedDate;
+}
+     document.addEventListener('DOMContentLoaded', function() {
+    fetchSheetData(); // Initial fetch
+    setInterval(fetchSheetData, 10000); // Fetch data every 30 seconds
+});
+    document.addEventListener('DOMContentLoaded', function() {
+    // Your existing fetchSheetData calls and setInterval setup
+
+    // Function to display the current date
+    displayCurrentDate();
+});
+  </script>
+</body>
+</html>
